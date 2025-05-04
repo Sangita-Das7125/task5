@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz App</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: pink;
+    }
+
+    .app {
+      background: #fff;
+      width: 90%;
+      max-width: 600px;
+      margin: 100px auto 0;
+      border-radius: 10px;
+      padding: 30px;
+    }
+
+    .app h1 {
+      font-size: 25px;
+      color: rgb(64, 0, 128);
+      font-weight: 600;
+      /* border-bottom: 1px solid #333; */
+      padding-bottom: 30px;
+    }
+
+    .quiz {
+      padding: 20px 0;
+    }
+
+    .quiz h2 {
+      font-size: 18px;
+      color: #001e4d;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    #answer-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .btn {
+      background: #fff;
+      color: #222;
+      font-weight: 500;
+      border: 1px solid #222;
+      padding: 15px;
+      text-align: left;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      display: flex;
+      align-items: center;
+    }
+
+    .btn:hover:not([disabled]) {
+      background: #222;
+      color: #fff;
+    }
+
+    .btn:disabled {
+      cursor: no-drop;
+    }
+
+    .option-label {
+      font-weight: bold;
+      margin-right: 10px;
+      display: inline-block;
+      width: 20px;
+      color: #001e4d;
+    }
+
+    #next-btn {
+      background: #001e4d;
+      color: #fff;
+      font-weight: 500;
+      width: 150px;
+      border: 0;
+      padding: 10px;
+      margin: 20px auto 0;
+      border-radius: 4px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .correct {
+      background: green;
+    }
+
+    .incorrect {
+      background: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Quiz Application</h1>
+    <div class="quiz">
+      <h2 id="question">Question goes here</h2>
+      <div id="answer-buttons"></div>
+      <button id="next-btn">Next</button>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "What are the types of loops in C language?",
+        answers: [
+          { text: "4", correct: false },
+          { text: "3", correct: true },
+          { text: "2", correct: false },
+          { text: "1", correct: false },
+        ]
+      },
+      {
+        question: "Which is the smallest continent in the world?",
+        answers: [
+          { text: "Asia", correct: false },
+          { text: "Australia", correct: true },
+          { text: "Arctic", correct: false },
+          { text: "Africa", correct: false },
+        ]
+      },
+      {
+        question: "What is 2 + 2?",
+        answers: [
+          { text: "4", correct: true },
+          { text: "3", correct: false },
+          { text: "2", correct: false },
+          { text: "1", correct: false },
+        ]
+      },
+      {
+        question: "5 - 2 kitna hota hai?",
+        answers: [
+          { text: "4", correct: false },
+          { text: "3", correct: true },
+          { text: "2", correct: false },
+          { text: "1", correct: false },
+        ]
+      },{
+        question: "which keyword is used to define a function in python?",
+        answers: [
+          { text: "def", correct: true },
+          { text: "const", correct: false },
+          { text: "func", correct: false },
+          { text: "method", correct: false },
+        ]
+      },
+      {
+        question: "which method is used to removed a specific element from a list?",
+        answers: [
+          { text: "pop()", correct: false },
+          { text: "remove()", correct: true },
+          { text: "delete()", correct: false },
+          { text: "discard()", correct: false },
+        ]
+      },
+      {
+        question: "which of the following countries is known as the 'land of the Rising Sun'?",
+        answers: [
+          { text: "China", correct: false },
+          { text: "Japan", correct: true },
+          { text: "South korea", correct: false },
+          { text: "India", correct: false },
+        ]
+      },
+      {
+        question: "what is the size of char in a 32-bit c compiler?",
+        answers: [
+          { text: "1byte", correct: true },
+          { text: "1bits", correct: false },
+          { text: "3bytes", correct: false },
+          { text: "2byte", correct: false },
+        ]
+      },
+      {
+        question: "In c language FILE is of which data type?",
+        answers: [
+          { text: "int", correct: false },
+          { text: "struct", correct: true },
+          { text: "char*", correct: false },
+          { text: "none", correct: false },
+        ]
+      },
+      {
+        question: "who is the father of c languages?",
+        answers: [
+          { text: "steve jon", correct: false },
+          { text: "James Gosling", correct: false },
+          { text: "Dennis Ritchie", correct: true },
+          { text: "Ramus Lerdorf", correct: false },
+        ]
+      },
+
+    ];
+
+    const questionElement = document.getElementById("question");
+    const answerButtons = document.getElementById("answer-buttons");
+    const nextButton = document.getElementById("next-btn");
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    function startQuiz() {
+      currentQuestionIndex = 0;
+      score = 0;
+      nextButton.innerHTML = "Next";
+      showQuestion();
+    }
+
+    function showQuestion() {
+      resetState();
+      let currentQuestion = questions[currentQuestionIndex];
+      let questionNo = currentQuestionIndex + 1;
+      questionElement.innerHTML = questionNo + ". " + currentQuestion.question;
+
+      const optionLabels = ["A.", "B.", "C.", "D."];
+      currentQuestion.answers.forEach((answer, index) => {
+        const button = document.createElement("button");
+        button.innerHTML = `<span class="option-label">${optionLabels[index]}</span> ${answer.text}`;
+        button.classList.add("btn");
+        answerButtons.appendChild(button);
+        if (answer.correct) {
+          button.dataset.correct = answer.correct;
+        }
+        button.addEventListener("click", selectAnswer);
+      });
+    }
+
+    function resetState() {
+      nextButton.style.display = "none";
+      while (answerButtons.firstChild) {
+        answerButtons.removeChild(answerButtons.firstChild);
+      }
+    }
+
+    function selectAnswer(e) {
+      const selectedBtn = e.target.closest("button");
+      const isCorrect = selectedBtn.dataset.correct === "true";
+      if (isCorrect) {
+        selectedBtn.classList.add("correct");
+        score++;
+      } else {
+        selectedBtn.classList.add("incorrect");
+      }
+
+      Array.from(answerButtons.children).forEach(button => {
+        if (button.dataset.correct === "true") {
+          button.classList.add("correct");
+        }
+        button.disabled = true;
+      });
+
+      nextButton.style.display = "block";
+    }
+
+    function showScore() {
+      resetState();
+      questionElement.innerHTML = `You scored ${score} out of ${questions.length}!`;
+      nextButton.innerHTML = "Play Again";
+      nextButton.style.display = "block";
+    }
+
+    function handleNextButton() {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
+        showQuestion();
+      } else {
+        showScore();
+      }
+    }
+
+    nextButton.addEventListener("click", () => {
+      if (currentQuestionIndex < questions.length) {
+        handleNextButton();
+      } else {
+        startQuiz();
+      }
+    });
+
+    startQuiz();
+  </script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>weather app</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro&family=Literata">
+    <style>
+        body{
+            font-family: 'lato', sans-serif;
+            display: flex;
+            justify-content: center;
+            background-color: black;
+        }
+
+        .srh{
+            display: flex;
+            margin-top: 11px;
+
+        }
+
+        input{
+            width: 200px;
+            padding: 16px;
+            border-radius: 16px;
+            height: 8px;
+            border: none;
+            outline: none;
+            font-size: 19px;
+            background-color: rgb(206, 236, 246);
+        }
+
+        button{
+            width: 70px;
+            height: 35px;
+            border-radius: 4px;
+            border: none;
+            outline: none;
+            font-size: 18px;
+            background-color: rgb(191, 235, 250);
+            margin-top: 2px;
+            margin-inline: 9px;
+        }
+
+        ::placeholder{
+            color: black;
+        }
+
+        #city{
+            margin-top: 33px;
+            font-size: 33px;
+        }
+
+        #temp{
+            font-size: 40px;
+            margin-top: -13x;
+        }
+
+        #type{
+            font-size: 26px;
+            /* margin-top: -33px; */
+        }
+
+        .container{
+            width: 300;
+            padding: 22px;
+            text-align: center;
+            border-radius: 5px;
+            margin-top: 2%;
+            background-color: #fff;
+            
+        }
+        img{
+            width: 200px;
+            margin-top: -22px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="srh">
+            <input type="text" id="inp" value="" placeholder="Enter Location">
+            <button onclick="myFun()">search</button>
+
+        </div>
+        <h2 id="city"></h2>
+        <img id="img" src="" alt="">
+        <h2 id="temp"></h2>
+        <h2 id="type"></h2>
+    </div>
+    <script>
+let city = document.getElementById("city");
+let type = document.getElementById("type");
+let temp = document.getElementById("temp");
+let image = document.getElementById("img");
+let input = document.getElementById("inp");
+let API_key = "6be4da262ad1d0effeb5b3a1cd996e7d";
+
+const data = async function (search) {
+    let getData = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${search}&appid=${API_key}&units=metric`);
+    let jsonData = await getData.json();
+    console.log(jsonData);
+
+    city.innerHTML = jsonData.name;
+    temp.innerHTML = Math.floor(jsonData.main.temp) + "&deg;C";
+    type.innerHTML = jsonData.weather[0].main;
+
+    
+   if(type.innerHTML == "Clouds"){
+    image.src="clouds.png"
+   }else if(type.innerHTML == "Clear"){
+    image.src="clears.png"
+   }else if(type.innerHTML == "Rain"){
+    image.src="clears.png"
+   }else if(type.innerHTML == "Snow"){
+    image.src="rain.png"
+   }else if(type.innerHTML == "Haze"){
+    image.src="haze.png"
+   }else if(type.innerHTML == "Strom"){
+    image.src="strom.png"
+   }
+   input.value=""
+}
+
+
+function myFun(){
+    search=input.value;
+    data(search)
+
+}
+
+    </script>
+</body>
+</html>
